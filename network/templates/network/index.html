@@ -1,0 +1,49 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+
+{% block body %}
+{% if user.is_authenticated %}
+<h1 class="m-3">All  Posts</h1>
+<div class="d-flex w-80 p-3 m-3 border border-secondary">
+    <form action="{% url 'new-post' %}" method="post">
+        {% csrf_token %}
+        <label for="new-post" class="h4">New Post</label>
+        <br>
+        <textarea name="new-post" id="new-post" cols="190" rows="4"></textarea>
+        <br>
+        <button class="btn btn-primary">Post</button>
+    </form>
+</div>
+{% endif %}
+{% for post in page_obj %}
+
+<div class="d-flex flex-column p-3 m-3 border border-secondary">
+    <a href="{% url 'profile-page' post.user.username %}"><div class="p-1"><strong>{{post.user}}</strong></div></a>
+    {% if request.user == post.user %}
+    <div class="p-1">
+        <a href="#" class="edit" data-post-id="{{ post.id }}" id="edit-{{ post.id }}">Edit</a>
+    </div> 
+    {% endif %}
+    <div class="p-1" id="content-{{ post.id }}">{{post.content}}</div>
+    <div class="p-1 text-muted" id="timestamp-{{ post.id }}">{{post.timestamp}}</div>
+    <div class="p-1 like" id="like-{{ post.id }}" data-post-id="{{ post.id }}">&hearts; {{post.total_likes}}</div>
+</div>
+
+{% endfor %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+ 
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/post.js' %}"></script>
+{% endblock %}  
